@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ead39d">
+  <title>پنج ضربه تا عرعر!</title>
+  <meta name="description" content="یک بازی بامزه با شلاقِ نشانگر موس و مهمان عرعری">
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}body{cursor:none;background:#ead39d;color:#21140c;font-family:Tahoma,Arial,sans-serif;user-select:none}
+    main{height:100%;display:grid;place-items:center;position:relative;background:radial-gradient(circle at 50% 42%,#fff3c4 0 16%,transparent 50%),repeating-linear-gradient(18deg,transparent 0 8px,#5634120a 9px 10px)}
+    main:after{content:"";position:absolute;inset:18px;border:2px solid #21140c88;pointer-events:none}
+    header{position:absolute;z-index:2;top:35px;left:45px;right:45px;display:flex;justify-content:space-between;font-size:13px;font-weight:900}
+    .stamp{border:2px solid;padding:7px 12px;box-shadow:3px 3px #c83d28;transform:rotate(-2deg)}.sound{color:#265d46}
+    section{text-align:center;z-index:1;margin-top:-3vh}.eyebrow{color:#c83d28;font-weight:900;font-size:14px}
+    h1{font:clamp(72px,11vw,150px)/.8 Impact,"Arial Black",Tahoma,sans-serif;margin:20px 0;letter-spacing:-5px;transform:rotate(-1deg);text-shadow:5px 5px #f4b73c}
+    h1 em{display:block;color:#c83d28;font-style:normal;font-size:.78em;text-shadow:4px 4px #21140c}
+    .help{font-weight:700;line-height:1.9;font-size:16px}.counter{display:inline-flex;direction:ltr;gap:8px;background:#21140c;color:#8c7b61;padding:10px 18px;box-shadow:5px 5px #c83d28;font-size:23px}
+    .counter b{color:#f4b73c;width:18px}.label{direction:rtl;color:#fff3c4;font-size:13px;min-width:100px;align-self:center}
+    canvas{position:fixed;inset:0;z-index:20;pointer-events:none}.donkey{position:fixed;z-index:10;left:50%;bottom:-330px;transform:translateX(-50%);font-size:190px;transition:.4s cubic-bezier(.2,1.6,.4,1);filter:drop-shadow(8px 8px #21140c44);pointer-events:none}
+    .donkey.show{bottom:18px;animation:shake .16s infinite alternate}.bubble{position:absolute;right:-100px;top:-45px;font:bold 23px Impact,Tahoma;background:#fff3c4;border:4px solid #21140c;border-radius:50%;padding:20px;box-shadow:5px 5px #c83d28;white-space:nowrap}
+    .spark{position:fixed;z-index:19;width:80px;height:80px;transform:translate(-50%,-50%) scale(0);border:8px double #c83d28;border-radius:50%;pointer-events:none}.spark.go{animation:pop .25s}
+    footer{position:absolute;bottom:30px;font-size:11px;font-weight:900;opacity:.6}@keyframes pop{to{transform:translate(-50%,-50%) scale(1.5);opacity:0}}@keyframes shake{to{transform:translateX(-50%) rotate(4deg) translateY(-6px)}}
+    @media(max-width:600px){header{top:28px;left:30px;right:30px}.sound{display:none}h1{font-size:22vw}.help{font-size:14px;padding:0 20px}.donkey{font-size:145px}.bubble{right:-40px;top:-60px;font-size:18px}}
+  </style>
+</head>
+<body>
+<main id="game">
+  <header><span class="stamp">باشگاه شلاق</span><span class="sound">صدا روشن است ●</span></header>
+  <section>
+    <p class="eyebrow">هدف‌گیری کن · کلیک کن · غافلگیر شو</p>
+    <h1>پنج ضربه<em>تا عرعر!</em></h1>
+    <p class="help">شلاق همراه نشانگر توست؛ هر جا خواستی کلیک کن.<br>ضربه‌ی پنجم مهمان ویژه را بیدار می‌کند.</p>
+    <div class="counter" id="counter"><span>○</span><span>○</span><span>○</span><span>○</span><span>○</span><strong class="label">آماده‌ای؟</strong></div>
+  </section>
+  <div class="donkey" id="donkey"><span class="bubble">عــــــــر عــــــــر!</span>🫏</div>
+  <div class="spark" id="spark"></div>
+  <canvas id="whip"></canvas>
+  <footer>حرکت بده تا شلاق جان بگیرد</footer>
+</main>
+<script>
+  const canvas=document.querySelector("#whip"),ctx=canvas.getContext("2d"),mouse={x:innerWidth/2,y:innerHeight/2},trail=Array.from({length:20},()=>({...mouse}));
+  let hits=0;addEventListener("pointermove",e=>{mouse.x=e.clientX;mouse.y=e.clientY},{passive:true});
+  function draw(){let d=Math.min(devicePixelRatio,2);if(canvas.width!==innerWidth*d){canvas.width=innerWidth*d;canvas.height=innerHeight*d;canvas.style.width=innerWidth+"px";canvas.style.height=innerHeight+"px"}ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,innerWidth,innerHeight);trail[0].x+=(mouse.x-trail[0].x)*.5;trail[0].y+=(mouse.y-trail[0].y)*.5;for(let i=1;i<trail.length;i++){trail[i].x+=(trail[i-1].x-trail[i].x)*.36;trail[i].y+=(trail[i-1].y-trail[i].y)*.36}ctx.lineCap="round";ctx.beginPath();ctx.moveTo(trail[19].x,trail[19].y);for(let i=18;i>=0;i--)ctx.lineTo(trail[i].x,trail[i].y);ctx.strokeStyle="#21140c";ctx.lineWidth=6;ctx.stroke();ctx.strokeStyle="#f4b73c";ctx.lineWidth=2;ctx.stroke();ctx.fillStyle="#6e321b";ctx.fillRect(trail[19].x-5,trail[19].y-5,28,10);requestAnimationFrame(draw)}draw();
+  function bray(){const A=window.AudioContext||window.webkitAudioContext,a=new A(),g=a.createGain(),f=a.createBiquadFilter();g.gain.setValueAtTime(.001,a.currentTime);g.gain.exponentialRampToValueAtTime(.45,a.currentTime+.03);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+1.5);f.type="bandpass";f.frequency.value=900;f.connect(g);g.connect(a.destination);[0,.62].forEach((o,i)=>{let s=a.createOscillator(),w=a.createOscillator(),m=a.createGain();s.type=i?"sawtooth":"square";s.frequency.setValueAtTime(i?315:245,a.currentTime+o);s.frequency.exponentialRampToValueAtTime(i?205:330,a.currentTime+o+.5);w.frequency.value=19;m.gain.value=22;w.connect(m);m.connect(s.frequency);s.connect(f);s.start(a.currentTime+o);w.start(a.currentTime+o);s.stop(a.currentTime+o+.72);w.stop(a.currentTime+o+.72)});setTimeout(()=>a.close(),1800)}
+  document.querySelector("#game").addEventListener("pointerdown",e=>{const spark=document.querySelector("#spark");spark.style.left=e.clientX+"px";spark.style.top=e.clientY+"px";spark.classList.remove("go");void spark.offsetWidth;spark.classList.add("go");hits++;if(hits===5){hits=0;const d=document.querySelector("#donkey");d.classList.add("show");bray();setTimeout(()=>d.classList.remove("show"),3600)}const spans=document.querySelectorAll("#counter span");spans.forEach((s,i)=>{s.textContent=i<hits?"×":"○";s.style.color=i<hits?"#f4b73c":""});document.querySelector(".label").textContent=hits?5-hits+" ضربه مانده":"آماده‌ای؟"});
+</script>
+</body>
+</html>
